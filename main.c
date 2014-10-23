@@ -5,6 +5,7 @@
 GtkBuilder *builder;
 
 static void ChangeToGreyScale (GdkPixbuf *pixbuf);
+static void ChangeToBW(GdkPixbuf *pixbuf, int threshold);
 
 int main (int argc, char *argv[]) 
 {
@@ -19,7 +20,13 @@ int main (int argc, char *argv[])
 
   myBMP = gdk_pixbuf_new_from_file("oiseau.bmp",&myError);
 
-  ChangeToGreyScale(myBMP);
+  //ChangeToGreyScale(myBMP);
+  ChangeToBW(myBMP,128);
+
+
+  gdk_pixbuf_save(myBMP,"greyoiseau.bmp", "bmp", &myError,NULL);
+  gdk_pixbuf_save(myBMP,"greyoiseau2.jpeg", "jpeg", &myError,NULL);
+
 
   width = gdk_pixbuf_get_width (myBMP);
   printf("myBMP->width: %d\n",width);
@@ -78,5 +85,40 @@ int main (int argc, char *argv[])
   p[0]=grey;
   p[1]=grey;
   p[2]=grey;
+ }
+}
+
+static void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
+{
+int width, height, rowstride, n_channels;
+  guchar *pixels, *p;
+  int x;
+  int y;
+  int grey;
+
+  // Get all image data needed for this operation
+  n_channels = gdk_pixbuf_get_n_channels (pixbuf);
+  width = gdk_pixbuf_get_width (pixbuf);
+  height = gdk_pixbuf_get_height (pixbuf);
+  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+  pixels = gdk_pixbuf_get_pixels (pixbuf);
+
+  // Loop through all pixels
+  for (x=0;x<width;x++)
+ for (y=0;y<height;y++)
+ {
+  p = pixels + y * rowstride + x * n_channels;
+  if ((p[0] + p[1] + p[2])/3 > threshold)
+    {
+      p[0]=255;
+      p[1]=255;
+      p[2]=255;
+    }
+  else
+    {
+      p[0]=0;
+      p[1]=0;
+      p[2]=2;
+    }
  }
 }
