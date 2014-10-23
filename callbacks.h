@@ -1,7 +1,7 @@
 #ifndef CALLBACKS_H
 #define CALLBACKS_H
 
-#include <gtk-3.0/gtk/gtk.h>
+#include <gtk/gtk.h>
 
 /*G_MODULE_EXPORT void on_window1_destroy (GtkObject *object, gpointer user_data) ;*/
 void on_file_activate (GtkWidget *widget, gpointer user_data) ;
