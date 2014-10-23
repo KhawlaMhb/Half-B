@@ -4,11 +4,25 @@
 
 GtkBuilder *builder;
 
-int main (int argc, char *argv[]) {
-      GtkWidget *window1;
-      GtkImage *image;
+int main (int argc, char *argv[]) 
+{
+  GtkWidget *window1;
+  GtkImage *image;
+  GdkPixbuf *myBMP;
 
-      gtk_init (&argc, &argv);
+  GError *myError = 0;
+  int width;
+
+  gtk_init (&argc, &argv);
+
+  myBMP = gdk_pixbuf_new_from_file("oiseau.bmp",&myError);
+
+  width = gdk_pixbuf_get_width (myBMP);
+  printf("myBMP->width: %d",width);
+
+  /* 
+
+      
           
       builder = gtk_builder_new ();
         if (gtk_builder_add_from_file (builder, "interfacevs1.glade", NULL) == 0) 
@@ -24,13 +38,13 @@ int main (int argc, char *argv[]) {
       gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
 
       gtk_builder_connect_signals (builder, NULL);
-      gtk_builder_add_callback_symbol(builder, "on_file_activate", G_CALLBACK(on_file_activate));
+      //gtk_builder_add_callback_symbol(builder, "on_file_activate", G_CALLBACK(on_file_activate));
                   
       gtk_widget_show (window1);
       gtk_widget_show (GTK_WIDGET(image));
 
       gtk_main ();
-      g_object_unref (G_OBJECT (builder));
+      g_object_unref (G_OBJECT (builder));*/
 
                         
          return 0;
