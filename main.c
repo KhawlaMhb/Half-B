@@ -56,9 +56,8 @@ int main (int argc, char *argv[])
 
       gtk_main ();
       g_object_unref (G_OBJECT (builder));*/
-
                         
-         return 0;
+      return 0;
 }
 
  static void ChangeToGreyScale (GdkPixbuf *pixbuf)
