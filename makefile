@@ -5,7 +5,7 @@ CFLAGS= -std=c99
 
 LDLIBS= `pkg-config --libs gtk+-3.0` -rdynamic
 
-SRC= main.c callbacks.c 
+SRC= main.c callbacks.c division.c
 OBJ= ${SRC:.c=.o}
 
 all: main
