@@ -18,7 +18,8 @@ guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
  }
 
 
-static void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue, guchar alpha)
+static void put_pixel (GdkPixbuf *pixbuf, int x, int y, 
+		       guchar red, guchar green, guchar blue, guchar alpha)
 {
       int width, height, rowstride, n_channels;
       guchar *pixels, *p;
@@ -47,7 +48,7 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green
 }
 int whiteline(GdkPixbuf *pixbuf, int x, int y)
 {
-    int count =0;
+    int count = 0;
     guchar *p;
 
     for(x=0; x < gdk_pixbuf_get_width(pixbuf); x++)
@@ -57,12 +58,10 @@ int whiteline(GdkPixbuf *pixbuf, int x, int y)
         if((p[0] == 255) &&( p[1] == 255) &&( p[2] == 255))
             {
                 count++;
-            } 
-       
+            }
    }
    return count;
 }
-
 
 void put_redline(GdkPixbuf *pixbuf, int y)
 {
@@ -89,28 +88,29 @@ void line(GdkPixbuf *pixbuf)
         {
             if(y == 0)
             {
-                if((whiteline(pixbuf,x,y) == width)&&( whiteline(pixbuf,x,y+1) != width) )
+                if((whiteline(pixbuf,x,y) == width)
+		   &&(whiteline(pixbuf,x,y+1) != width))
                 {
                      put_redline(pixbuf, y);
                      break;
                 }
-
             }
              if(y == height - 1)
             {
-                if((whiteline(pixbuf,x,y) == width)&&( whiteline(pixbuf,x,y - 1) != width) )
+                if((whiteline(pixbuf,x,y) == width)
+		   &&(whiteline(pixbuf,x,y-1) != width))
                 {
                      put_redline(pixbuf, y);
                      break;
                 }
-
             }
 
-            if((whiteline(pixbuf,x,y) == width) && ((whiteline(pixbuf,x,y-1) != width) ||( whiteline(pixbuf,x,y+1) != width)))
+	     if((whiteline(pixbuf,x,y) == width)
+		&& ((whiteline(pixbuf,x,y-1) != width)
+	       || (whiteline(pixbuf,x,y+1) != width)))
             {
-              put_redline(pixbuf, y); 
+              put_redline(pixbuf, y);
             }
-
         }
         printf("check x: %d",x);
     }
