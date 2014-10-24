@@ -19,10 +19,13 @@ int main (int argc, char *argv[])
 
   myBMP = gdk_pixbuf_new_from_file("car.jpg",&myError); // only car.jpg can be read what kind of sorcery is that
   ChangeToBW(myBMP,128);
+  printf("ahhaha");
   line(myBMP);
+ printf("ahhaha");
+
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError, NULL);
           
-  builder = gtk_builder_new ();
+   builder = gtk_builder_new ();
   if (gtk_builder_add_from_file (builder, "interfacevs1.glade", NULL) == 0) 
    {
             fprintf (stderr, "Erreur: ouverture du fichier GLADE\n") ;
@@ -41,7 +44,7 @@ int main (int argc, char *argv[])
 
       gtk_main ();
       g_object_unref (G_OBJECT (builder));
-                        
+                    
       return 0;
 }
 
@@ -62,6 +65,7 @@ int width, height, rowstride, n_channels;
 
   // Loop through all pixels
   for (x=0;x<width;x++)
+  {
  for (y=0;y<height;y++)
  {
   p = pixels + y * rowstride + x * n_channels;
@@ -75,7 +79,8 @@ int width, height, rowstride, n_channels;
     {
       p[0]=0;
       p[1]=0;
-      p[2]=2;
+      p[2]=0;
     }
  }
+  }
 }

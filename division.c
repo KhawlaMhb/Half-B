@@ -4,17 +4,6 @@
 #include <gdk/gdk.h>
 #include "division.h"
 
-/*
-static void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green, guchar blue, guchar alpha);
-struct pixel* get_pixel(GdkPixbuf *pixbuf, int x, int y);
-*/
-
-/*int main_(int argc, char *args[])
-{
-    init_gtk();
-    return 0;
-}*/
-
 guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
 {
   int rowstride, n_channels;
@@ -56,31 +45,16 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y, guchar red, guchar green
       p[2] = blue;
       p[3] = alpha;
 }
-
-void line(GdkPixbuf *pixbuf)
+int whiteline(GdkPixbuf *pixbuf, int x, int y)
 {
+    int count =0;
+    guchar *p;
 
-    int x, y;
-
- for(x=0; x<gdk_pixbuf_get_width(pixbuf); x++)
-    { 
-        for(y=0; y<gdk_pixbuf_get_height(pixbuf); y++)
-        {
-            if(whiteline(pixbuf,y) == gdk_pixbuf_get_width(pixbuf) && (whiteline(pixbuf,y-1) != gdk_pixbuf_get_width(pixbuf)  || whiteline(pixbuf,y+1) != gdk_pixbuf_get_width(pixbuf)))
-            {
-              put_redline(pixbuf, y); 
-            }
-
-        }
-    }
-}
-
-int whiteline(GdkPixbuf *pixbuf, int y)
-{
-    int x, count =0;
     for(x=0; x < gdk_pixbuf_get_width(pixbuf); x++)
     {
-        if(get_pixel(pixbuf, x, y)==0)
+         p = get_pixel(pixbuf, x, y);
+
+        if((p[0] == 255) &&( p[1] == 255) &&( p[2] == 255))
             {
                 count++;
             } 
@@ -92,12 +66,54 @@ int whiteline(GdkPixbuf *pixbuf, int y)
 
 void put_redline(GdkPixbuf *pixbuf, int y)
 {
-    int x=0;
-    while(x<gdk_pixbuf_get_width(pixbuf))
+    int x = 0;
+    int width = gdk_pixbuf_get_width(pixbuf);
+
+    while(x < width)
     {    
-        put_pixel(pixbuf, x, y, 120, 0, 0, 0); //pixel rouge valeur
+        put_pixel(pixbuf, x, y, 255, 0, 0, 255); //pixel rouge valeur
         x++;
     }
-
 }
+
+void line(GdkPixbuf *pixbuf)
+{
+    int width = gdk_pixbuf_get_width(pixbuf);
+    int height = gdk_pixbuf_get_height(pixbuf);
+    int x, y;
+    printf("check1");
+
+ for(x=0; x < width; x++)
+    { 
+        for(y=0; y < height; y++)
+        {
+            if(y == 0)
+            {
+                if((whiteline(pixbuf,x,y) == width)&&( whiteline(pixbuf,x,y+1) != width) )
+                {
+                     put_redline(pixbuf, y);
+                     break;
+                }
+
+            }
+             if(y == height - 1)
+            {
+                if((whiteline(pixbuf,x,y) == width)&&( whiteline(pixbuf,x,y - 1) != width) )
+                {
+                     put_redline(pixbuf, y);
+                     break;
+                }
+
+            }
+
+            if((whiteline(pixbuf,x,y) == width) && ((whiteline(pixbuf,x,y-1) != width) ||( whiteline(pixbuf,x,y+1) != width)))
+            {
+              put_redline(pixbuf, y); 
+            }
+
+        }
+        printf("check x: %d",x);
+    }
+}
+
 
