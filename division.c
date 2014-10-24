@@ -55,7 +55,7 @@ int whiteline(GdkPixbuf *pixbuf, int x, int y)
     {
          p = get_pixel(pixbuf, x, y);
 
-        if((p[0] == 255) &&( p[1] == 255) &&( p[2] == 255))
+        if((p[0] == 255) && (p[1] == 255) && (p[2] == 255))
             {
                 count++;
             }
@@ -92,10 +92,9 @@ void line(GdkPixbuf *pixbuf)
 		   &&(whiteline(pixbuf,x,y+1) != width))
                 {
                      put_redline(pixbuf, y);
-                     break;
                 }
             }
-             if(y == height - 1)
+	    else if(y == height - 1)
             {
                 if((whiteline(pixbuf,x,y) == width)
 		   &&(whiteline(pixbuf,x,y-1) != width))
@@ -105,7 +104,7 @@ void line(GdkPixbuf *pixbuf)
                 }
             }
 
-	     if((whiteline(pixbuf,x,y) == width)
+	    else if((whiteline(pixbuf,x,y) == width)
 		&& ((whiteline(pixbuf,x,y-1) != width)
 	       || (whiteline(pixbuf,x,y+1) != width)))
             {
