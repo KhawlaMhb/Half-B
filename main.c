@@ -27,12 +27,7 @@ int main (int argc, char *argv[])
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError, NULL);
           
    builder = gtk_builder_new ();
-  if (gtk_builder_add_from_file (builder, "interfacevs1.glade", NULL) == 0) 
-   {
-            fprintf (stderr, "Erreur: ouverture du fichier GLADE\n") ;
-            exit(1);
-   }
-             
+              
       window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
       image = gtk_builder_get_object(builder, "image1");
       gtk_image_set_from_file(image, "BWcar.jpeg");
