@@ -28,8 +28,8 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
 
       g_assert (gdk_pixbuf_get_colorspace (pixbuf) == GDK_COLORSPACE_RGB);
       g_assert (gdk_pixbuf_get_bits_per_sample (pixbuf) == 8);
-      g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
-      g_assert (n_channels == 4);
+     // g_assert (gdk_pixbuf_get_has_alpha (pixbuf));
+     // g_assert (n_channels == 4);
 
       width = gdk_pixbuf_get_width (pixbuf);
       height = gdk_pixbuf_get_height (pixbuf);
@@ -46,10 +46,11 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
       p[2] = blue;
       p[3] = alpha;
 }
-int whiteline(GdkPixbuf *pixbuf, int x, int y)
+int whiteline(GdkPixbuf *pixbuf, int y)
 {
     int count = 0;
     guchar *p;
+    int x;
 
     for(x=0; x < gdk_pixbuf_get_width(pixbuf); x++)
     {
@@ -74,45 +75,75 @@ void put_redline(GdkPixbuf *pixbuf, int y)
         x++;
     }
 }
+int red(GdkPixbuf *pixbuf, int y)
+{
+    int count = 0;
+    int x = 0;
+    guchar *p;
+    //for(x=0; x < gdk_pixbuf_get_width(pixbuf); x++)
+    //{
+         p = get_pixel(pixbuf, x, y);
+
+        if((p[0] == 255) && (p[1] == 0) && (p[2] == 0))
+            {
+               return 0;
+            }
+   //}
+   return 1;
+
+}
 
 void line(GdkPixbuf *pixbuf)
 {
     int width = gdk_pixbuf_get_width(pixbuf);
     int height = gdk_pixbuf_get_height(pixbuf);
     int x, y;
-    printf("check1");
 
- for(x=0; x < width; x++)
-    { 
+ //for(x=0; x < width; x++)
+   // { 
         for(y=0; y < height; y++)
         {
             if(y == 0)
             {
-                if((whiteline(pixbuf,x,y) == width)
-		   &&(whiteline(pixbuf,x,y+1) != width))
+                if((whiteline(pixbuf,y) == width)
+		   &&(whiteline(pixbuf,y+1) != width) && red (pixbuf,y+1) !=
+                   0)
                 {
                      put_redline(pixbuf, y);
-                }
-            }
-	    else if(y == height - 1)
-            {
-                if((whiteline(pixbuf,x,y) == width)
-		   &&(whiteline(pixbuf,x,y-1) != width))
-                {
-                     put_redline(pixbuf, y);
+                    printf("Check  y==0 with y = %d, x = %d\n",y,x);
                      break;
                 }
             }
+	    else 
+            { 
+                if(y == height - 1)
+                {
+                        if((whiteline(pixbuf,y) == width)
+		        &&(whiteline(pixbuf,y-1) != width) /*&& red
+                        (pixbuf,y-1)!=0*/)
+                            
+                        {
+                                put_redline(pixbuf, y);
+                                printf("Check  y==h-1 with y = %d, x = %d\n",y,x);
 
-	    else if((whiteline(pixbuf,x,y) == width)
-		&& ((whiteline(pixbuf,x,y-1) != width)
-	       || (whiteline(pixbuf,x,y+1) != width)))
-            {
-              put_redline(pixbuf, y);
+                                break;
+                        }
+                }
+            
+	        else 
+                {
+                    if((whiteline(pixbuf,y) == width)
+		    && (((whiteline(pixbuf,y-1) != width) && red(pixbuf,y-1)) ||
+                        ((whiteline(pixbuf,y+1) != width)&&red(pixbuf,y+1))))
+                    {
+                        put_redline(pixbuf, y);
+ printf("Check  y==y with y = %d, x = %d\n",y,x);
+
+                    }
+                }
             }
         }
-        printf("check x: %d",x);
-    }
+   // }
 }
 
 
