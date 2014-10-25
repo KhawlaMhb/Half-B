@@ -17,7 +17,8 @@ int main (int argc, char *argv[])
 
   gtk_init (&argc, &argv);
 
-  myBMP = gdk_pixbuf_new_from_file("car.jpg",&myError); // only car.jpg can be read what kind of sorcery is that
+  myBMP = gdk_pixbuf_new_from_file("car.jpg",&myError); 
+  // only car.jpg can be read what kind of sorcery is that
   ChangeToBW(myBMP,128);
   printf("ahhaha");
   line(myBMP);
