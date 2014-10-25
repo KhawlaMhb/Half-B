@@ -57,7 +57,7 @@ int whiteline(GdkPixbuf *pixbuf, int y)
       p = get_pixel(pixbuf, x, y);
 
       if(((p[0] == 255) && (p[1] == 255) && (p[2] == 255))
-	 ||(p[0] == 255) && (p[1] == 0) && (p[2] == 0))
+	 || ((p[0] == 255) && (p[1] == 0) && (p[2] == 0)))
 	{
 	  count++;
 	}
@@ -103,7 +103,7 @@ void line(GdkPixbuf *pixbuf)
 		 && (whiteline(pixbuf,y-1) != width))
 		{
 		  put_redline(pixbuf, y);
-		  printf("Check y == h - 1 with y = %\n",y);
+		  //printf("Check y == h - 1 with y = %\n",y);
 		  break;
 		}
 	    }
@@ -131,8 +131,12 @@ int whitecolumn(GdkPixbuf *pixbuf, int x)
     {
       p = get_pixel(pixbuf, x, y);
 
-      if(((p[0] == 255) && (p[1] == 255) && (p[2] == 255))  //white pixel
-	 ||(p[0] == 255) && (p[1] == 0) && (p[2] == 0))     //red pixel
+      //if the pixel is white
+      if((p[0] == 255)&&(p[1] == 255 ) && (p[2] == 255))
+	{
+	  count++;
+	}
+      else if(!((p[0] == 0)&&(p[1] == 0) && (p[2] == 0)))
 	{
 	  count++;
 	}
@@ -161,6 +165,7 @@ void column(GdkPixbuf *pixbuf)
 
   for(x = 0; x < width; x++)
     {
+
       if(x == 0)
 	{
 	  if((whitecolumn(pixbuf,x) == height)
@@ -186,11 +191,11 @@ void column(GdkPixbuf *pixbuf)
 	  else
 	    {
 	      if((whitecolumn(pixbuf,x) == height)
-		 && (((whitecolumn(pixbuf,x-1) != height)) ||
-		     (whitecolumn(pixbuf,x+1) != height)))
+		 /*&& (((whitecolumn(pixbuf,x-1) != height) ||
+		   (whitecolumn(pixbuf,x+1) != height)))*/)
 		{
-		  //put_redcolumn(pixbuf, x);
 		  printf("Check x==x with x = %d\n",x);
+		  put_redcolumn(pixbuf, x);
 		}
 	    }
 	}
