@@ -121,22 +121,26 @@ void line(GdkPixbuf *pixbuf)
     }
 }
 
+int isWhite(guchar *p)
+{
+    if (p[0]==255 && p[1]==255 && p[2]==255) return 1;
+    if (p[0]==255 && p[1]==0 && p[2]==0) return 1;
+    return 0;
+}
+
 int whitecolumn(GdkPixbuf *pixbuf, int x)
 {
   int count = 0;
   guchar *p;
   int y;
 
+
   for(y = 0; y < gdk_pixbuf_get_height(pixbuf); y++)
     {
       p = get_pixel(pixbuf, x, y);
 
       //if the pixel is white
-      if((p[0] == 255)&&(p[1] == 255 ) && (p[2] == 255))
-	{
-	  count++;
-	}
-      else if(!((p[0] == 0)&&(p[1] == 0) && (p[2] == 0)))
+      if(isWhite(p))
 	{
 	  count++;
 	}
@@ -148,6 +152,9 @@ void put_redcolumn(GdkPixbuf *pixbuf, int x)
 {
     int y = 0;
     int height = gdk_pixbuf_get_height(pixbuf);
+
+
+  printf("Red Column: %d\n",x);
 
     while(y < height)
     {
@@ -191,10 +198,13 @@ void column(GdkPixbuf *pixbuf)
 	  else
 	    {
 	      if((whitecolumn(pixbuf,x) == height)
-		 /*&& (((whitecolumn(pixbuf,x-1) != height) ||
-		   (whitecolumn(pixbuf,x+1) != height)))*/)
+		 && ((whitecolumn(pixbuf,x-1) != height ||
+		       (whitecolumn(pixbuf,x+1) != height))))
 		{
 		  printf("Check x==x with x = %d\n",x);
+		  printf("Check count = %d\n",whitecolumn(pixbuf,x));
+		  printf("Check count x-1  = %d\n",whitecolumn(pixbuf,x-1));
+		  printf("Check count x+1 = %d\n",whitecolumn(pixbuf,x+1));
 		  put_redcolumn(pixbuf, x);
 		}
 	    }
