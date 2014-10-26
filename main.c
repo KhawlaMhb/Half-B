@@ -12,6 +12,9 @@ int main (int argc, char *argv[])
   GtkWidget *window1;
   GtkImage *image;
   GdkPixbuf *myBMP;
+  int minx, maxx;
+  minx = 0;
+  maxx = 0;
 
   GError *myError = 0;
 
@@ -21,8 +24,8 @@ int main (int argc, char *argv[])
   // only car.jpg can be read what kind of sorcery is that
   ChangeToBW(myBMP,128);
   //printf("ahhahao");
-  line(myBMP);
-  column(myBMP);
+  column(myBMP, &minx, &maxx);
+  line(myBMP, &minx, &maxx);
   //printf("ahhaha");
 
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
@@ -53,7 +56,7 @@ int main (int argc, char *argv[])
 
 static void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
 {
-int width, height, rowstride, n_channels;
+  int width, height, rowstride, n_channels;
   guchar *pixels, *p;
   int x;
   int y;
@@ -68,22 +71,22 @@ int width, height, rowstride, n_channels;
 
   // Loop through all pixels
   for (x=0;x<width;x++)
-  {
- for (y=0;y<height;y++)
- {
-  p = pixels + y * rowstride + x * n_channels;
-  if ((p[0] + p[1] + p[2])/3 > threshold)
     {
-      p[0]=255;
-      p[1]=255;
-      p[2]=255;
+      for (y=0;y<height;y++)
+	{
+	  p = pixels + y * rowstride + x * n_channels;
+	  if ((p[0] + p[1] + p[2])/3 > threshold)
+	    {
+	      p[0]=255;
+	      p[1]=255;
+	      p[2]=255;
+	    }
+	  else
+	    {
+	      p[0]=0;
+	      p[1]=0;
+	      p[2]=0;
+	    }
+	}
     }
-  else
-    {
-      p[0]=0;
-      p[1]=0;
-      p[2]=0;
-    }
- }
-  }
 }
