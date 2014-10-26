@@ -119,6 +119,18 @@ void line(GdkPixbuf *pixbuf)
     }
 }
 
+int isMIN(int minx, int x)
+{
+  if (minx > x) return x;
+  else return minx;
+}
+
+int isMAX(int maxx, int x)
+{
+  if(maxx > x) return maxx;
+  else return x;
+}
+
 int isWhite(guchar *p)
 {
     if (p[0]==255 && p[1]==255 && p[2]==255) {
@@ -135,7 +147,6 @@ int whitecolumn(GdkPixbuf *pixbuf, int x)
   int count = 0;
   guchar *p;
   int y;
-
 
   for(y = 0; y < gdk_pixbuf_get_height(pixbuf); y++)
     {
@@ -172,7 +183,10 @@ void column(GdkPixbuf *pixbuf)
 	int width  = gdk_pixbuf_get_width(pixbuf);
 	int height = gdk_pixbuf_get_height(pixbuf);
 	int x, y;
+	int maxx, minx;
 
+	maxx = 0;
+	minx = height;
 
 	for(x = 0; x < width; x++)
 	{
@@ -181,7 +195,8 @@ void column(GdkPixbuf *pixbuf)
 			if ((whitecolumn(pixbuf,x) == height)
 					&& (whitecolumn(pixbuf,x + 1) != height))
 			{
-				put_redcolumn(pixbuf, x);
+		 	  minx = isMIN(minx, x);
+			  maxx = isMAX(maxx, x);
 				printf("Check  x==0 with x = %d\n",x);
 				break;
 			}
@@ -191,21 +206,26 @@ void column(GdkPixbuf *pixbuf)
 			if((whitecolumn(pixbuf,x) == height)
 					&&(whitecolumn(pixbuf,x-1) != height))
 			{
-				put_redcolumn(pixbuf, x);
+			  minx = isMIN(minx, x);
+			  maxx = isMAX(maxx, x);
+		 
 				printf("Check  x==h-1 with x = %d\n",x);
 				break;
 			}
 		}
 		else if ((whitecolumn(pixbuf,x) == height)
 		&& ((whitecolumn(pixbuf,x-1) != height ||
-		(whitecolumn(pixbuf,x+1) != height))))
+		(whitecolumn(pixbuf,x+1) != height ))))
 		{
 		  //printf("Check x==x with x = %d\n",x);
-		  //	printf("Check count = %d, height %d\n",whitecolumn(pixbuf,x), height);
-		  //	printf("Check count x-1  = %d\n",whitecolumn(pixbuf,x-1));
-		  //	printf("Check count x+1 = %d\n",whitecolumn(pixbuf,x+1));
-		  	put_redcolumn(pixbuf, x);
-toto ++;
+		  //printf("Check count = %d, height %d\n",whitecolumn(pixbuf,x), height);
+		  //printf("Check count x-1  = %d\n",whitecolumn(pixbuf,x-1));
+		  //printf("Check count x+1 = %d\n",whitecolumn(pixbuf,x+1));
+					  minx = isMIN(minx, x);
+			  maxx = isMAX(maxx, x);
+		  toto ++;
 		}
 	}
+		put_redcolumn(pixbuf, maxx);
+		put_redcolumn(pixbuf, minx);
 }

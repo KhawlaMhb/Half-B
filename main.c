@@ -20,14 +20,21 @@ int main (int argc, char *argv[])
   myBMP = gdk_pixbuf_new_from_file("car.jpg",&myError); 
   // only car.jpg can be read what kind of sorcery is that
   ChangeToBW(myBMP,128);
-  printf("ahhaha");
+  //printf("ahhahao");
   line(myBMP);
- printf("ahhaha");
+  column(myBMP);
+  //printf("ahhaha");
 
-  gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError, NULL);
+  gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
           
-   builder = gtk_builder_new ();
-              
+  builder = gtk_builder_new ();
+
+      gtk_builder_add_from_file (builder, "interfacevstest.glade", NULL);
+        if(myError != NULL)
+        {
+            printf("Error reading interface\nMessage: %s\n",myError->message);
+        }
+
       window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
       image = gtk_builder_get_object(builder, "image1");
       gtk_image_set_from_file(image, "BWcar.jpeg");
