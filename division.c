@@ -17,7 +17,7 @@ guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
   return p;
  }
 
-static void put_pixel (GdkPixbuf *pixbuf, int x, int y, 
+static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
 		       guchar red, guchar green, guchar blue)
 {
   int width, height, rowstride, n_channels;
@@ -63,19 +63,23 @@ int whiteline(GdkPixbuf *pixbuf, int y)
   return count;
 }
 
-void put_redline(GdkPixbuf *pixbuf, int y)
+void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
 {
     int x = 0;
+    int xcol=0;
+    guchar *p;
     int width = gdk_pixbuf_get_width(pixbuf);
 
-    while(x < width)
-    {    
-        put_pixel(pixbuf, x, y, 255, 0, 0); //pixel rouge valeur
-        x++;
+    p = get_pixel(pixbuf, x, y);
+
+    for(x = minx ; x < maxx ; x++)
+    {
+      put_pixel(pixbuf, x, y, 255, 0, 0); //pixel rouge valeur
+      x++;
     }
 }
 
-void line(GdkPixbuf *pixbuf)
+void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 {
   int width = gdk_pixbuf_get_width(pixbuf);
   int height = gdk_pixbuf_get_height(pixbuf);
@@ -88,31 +92,30 @@ void line(GdkPixbuf *pixbuf)
 	  if((whiteline(pixbuf,y) == width)
 	     &&(whiteline(pixbuf,y+1) != width))
 	    {
-	      put_redline(pixbuf, y);
+	      put_redline(pixbuf, y, *minx, *maxx);
 	      printf("Check  y==0 with y = %d\n",y);
 	      break;
 	    }
 	}
-      else 
-	{ 
+      else
+	{
 	  if(y == height - 1)
 	    {
 	      if((whiteline(pixbuf,y) == width)
 		 && (whiteline(pixbuf,y-1) != width))
 		{
-		  put_redline(pixbuf, y);
+		  put_redline(pixbuf, y, *minx, *maxx);
 		  //printf("Check y == h - 1 with y = %\n",y);
 		  break;
 		}
 	    }
-	  else 
+	  else
 	    {
 	      if((whiteline(pixbuf,y) == width)
 		 && (((whiteline(pixbuf,y-1) != width)) ||
 		     (whiteline(pixbuf,y+1) != width)))
 		{
-		  put_redline(pixbuf, y);
-		  //printf("Check  y==y with y = %d\n",y);
+		  put_redline(pixbuf, y, *minx, *maxx);
 		}
 	    }
 	}
@@ -166,37 +169,35 @@ void put_redcolumn(GdkPixbuf *pixbuf, int x)
     int y = 0;
     int height = gdk_pixbuf_get_height(pixbuf);
 
-
     // printf("Red Column: %d\n",x);
 
     while(y < height)
     {
-      // Color the pixel in red
+        // Color the pixel in red
         put_pixel(pixbuf, x, y, 255, 0, 0);
         y++;
     }
 }
 
-void column(GdkPixbuf *pixbuf)
+void column(GdkPixbuf *pixbuf, int *minx, int *maxx)
 {
  	static int toto = 0;
 	int width  = gdk_pixbuf_get_width(pixbuf);
 	int height = gdk_pixbuf_get_height(pixbuf);
 	int x, y;
-	int maxx, minx;
 
-	maxx = 0;
-	minx = height;
+	*maxx = 0;
+	*minx = height;
 
 	for(x = 0; x < width; x++)
 	{
 		if(x == 0)
 		{
 			if ((whitecolumn(pixbuf,x) == height)
-					&& (whitecolumn(pixbuf,x + 1) != height))
+			     && (whitecolumn(pixbuf,x + 1) != height))
 			{
-		 	  minx = isMIN(minx, x);
-			  maxx = isMAX(maxx, x);
+		 	  *minx = isMIN(*minx, x);
+			  *maxx = isMAX(*maxx, x);
 				printf("Check  x==0 with x = %d\n",x);
 				break;
 			}
@@ -206,8 +207,8 @@ void column(GdkPixbuf *pixbuf)
 			if((whitecolumn(pixbuf,x) == height)
 					&&(whitecolumn(pixbuf,x-1) != height))
 			{
-			  minx = isMIN(minx, x);
-			  maxx = isMAX(maxx, x);
+			  *minx = isMIN(*minx, x);
+			  *maxx = isMAX(*maxx, x);
 		 
 				printf("Check  x==h-1 with x = %d\n",x);
 				break;
@@ -217,15 +218,11 @@ void column(GdkPixbuf *pixbuf)
 		&& ((whitecolumn(pixbuf,x-1) != height ||
 		(whitecolumn(pixbuf,x+1) != height ))))
 		{
-		  //printf("Check x==x with x = %d\n",x);
-		  //printf("Check count = %d, height %d\n",whitecolumn(pixbuf,x), height);
-		  //printf("Check count x-1  = %d\n",whitecolumn(pixbuf,x-1));
-		  //printf("Check count x+1 = %d\n",whitecolumn(pixbuf,x+1));
-					  minx = isMIN(minx, x);
-			  maxx = isMAX(maxx, x);
+		  *minx = isMIN(*minx, x);
+		  *maxx = isMAX(*maxx, x);
 		  toto ++;
 		}
 	}
-		put_redcolumn(pixbuf, maxx);
-		put_redcolumn(pixbuf, minx);
+	put_redcolumn(pixbuf, *maxx);
+	put_redcolumn(pixbuf, *minx);
 }

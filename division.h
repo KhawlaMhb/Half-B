@@ -8,10 +8,9 @@
 static void put_pixel (GdkPixbuf *pixbuf, int x, int y, 
 		       guchar red, guchar green, guchar blue);
 guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y);
-void line (GdkPixbuf *pixbuf);
+void line (GdkPixbuf *pixbuf, int *minx, int *maxx);
 int whiteline(GdkPixbuf *pixbuf,int y);
-void put_redline(GdkPixbuf *pixbuf, int y);
-void column(GdkPixbuf *pixbuf);
+void column(GdkPixbuf *pixbuf, int *minx, int *maxx);
 int whitecolumn(GdkPixbuf *pixbuf,int y);
 void put_redcolumn(GdkPixbuf *pixbuf, int y);
 int isWhite(guchar *p);
