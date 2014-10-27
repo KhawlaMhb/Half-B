@@ -15,7 +15,7 @@ guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
 
   p = pixels + y * rowstride + x * n_channels;
   return p;
- }
+}
 
 static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
 		       guchar red, guchar green, guchar blue)
@@ -31,7 +31,6 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
 
   width = gdk_pixbuf_get_width (pixbuf);
   height = gdk_pixbuf_get_height (pixbuf);
-
   g_assert (x >= 0 && x < width);
   g_assert (y >= 0 && y < height);
 
@@ -44,6 +43,7 @@ static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
   p[2] = blue;
 }
 
+// Checks if every pixel on the line are white
 int whiteline(GdkPixbuf *pixbuf, int y)
 {
   int count = 0;
@@ -53,9 +53,8 @@ int whiteline(GdkPixbuf *pixbuf, int y)
   for(x=0; x < gdk_pixbuf_get_width(pixbuf); x++)
     {
       p = get_pixel(pixbuf, x, y);
-
       if(((p[0] == 255) && (p[1] == 255) && (p[2] == 255))
-	 || ((p[0] == 255) && (p[1] == 0) && (p[2] == 0)))
+	   || ((p[0] == 255) && (p[1] == 0) && (p[2] == 0)))
 	{
 	  count++;
 	}
@@ -63,27 +62,29 @@ int whiteline(GdkPixbuf *pixbuf, int y)
   return count;
 }
 
+// Draw a red line between two column lines (minx and maxx)
 void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
 {
-    int x = 0;
-    int xcol=0;
-    guchar *p;
-    int width = gdk_pixbuf_get_width(pixbuf);
+  int x;
+  //int xcol=0;
+  //guchar *p;
+  //int width = gdk_pixbuf_get_width(pixbuf);
 
-    p = get_pixel(pixbuf, x, y);
+  //p = get_pixel(pixbuf, x, y);
 
-    for(x = minx ; x < maxx ; x++)
+  for(x = minx ; x < maxx ; x++)
     {
-      put_pixel(pixbuf, x, y, 255, 0, 0); //pixel rouge valeur
+      put_pixel(pixbuf, x, y, 255, 0, 0); //red pixel value
       x++;
     }
 }
 
+// Goes through the image and draw a redline when needed
 void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 {
   int width = gdk_pixbuf_get_width(pixbuf);
   int height = gdk_pixbuf_get_height(pixbuf);
-  int x, y;
+  int y;
 
   for(y=0; y < height; y++)
     {
@@ -93,7 +94,6 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 	     &&(whiteline(pixbuf,y+1) != width))
 	    {
 	      put_redline(pixbuf, y, *minx, *maxx);
-	      printf("Check  y==0 with y = %d\n",y);
 	      break;
 	    }
 	}
@@ -105,7 +105,6 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 		 && (whiteline(pixbuf,y-1) != width))
 		{
 		  put_redline(pixbuf, y, *minx, *maxx);
-		  //printf("Check y == h - 1 with y = %\n",y);
 		  break;
 		}
 	    }
@@ -136,15 +135,17 @@ int isMAX(int maxx, int x)
 
 int isWhite(guchar *p)
 {
-    if (p[0]==255 && p[1]==255 && p[2]==255) {
-	 return 1;
-    }
-    if (p[0]==255 && p[1]==0 && p[2]==0) {
-	return 1;
-    }
-    return 0;
+  if (p[0]==255 && p[1]==255 && p[2]==255) {
+    return 1;
+  }
+  if (p[0]==255 && p[1]==0 && p[2]==0) {
+    return 1;
+  }
+  return 0;
 }
 
+
+// Check if the whole column has only white pixels
 int whitecolumn(GdkPixbuf *pixbuf, int x)
 {
   int count = 0;
@@ -164,65 +165,96 @@ int whitecolumn(GdkPixbuf *pixbuf, int x)
   return count;
 }
 
+// Draws a red column
 void put_redcolumn(GdkPixbuf *pixbuf, int x)
 {
-    int y = 0;
-    int height = gdk_pixbuf_get_height(pixbuf);
+  int y = 0;
+  int height = gdk_pixbuf_get_height(pixbuf);
 
-    // printf("Red Column: %d\n",x);
-
-    while(y < height)
+  while(y < height)
     {
-        // Color the pixel in red
-        put_pixel(pixbuf, x, y, 255, 0, 0);
-        y++;
+      // Color the pixel in red
+      put_pixel(pixbuf, x, y, 255, 0, 0);
+      y++;
     }
 }
 
+// Goes through the image and draws a red column when needed
 void column(GdkPixbuf *pixbuf, int *minx, int *maxx)
 {
- 	static int toto = 0;
-	int width  = gdk_pixbuf_get_width(pixbuf);
-	int height = gdk_pixbuf_get_height(pixbuf);
-	int x, y;
+  int width  = gdk_pixbuf_get_width(pixbuf);
+  int height = gdk_pixbuf_get_height(pixbuf);
+  int x;
 
-	*maxx = 0;
-	*minx = height;
+  *maxx = 0;
+  *minx = height;
 
-	for(x = 0; x < width; x++)
+  for(x = 0; x < width; x++)
+    {
+      if(x == 0)
 	{
-		if(x == 0)
-		{
-			if ((whitecolumn(pixbuf,x) == height)
-			     && (whitecolumn(pixbuf,x + 1) != height))
-			{
-		 	  *minx = isMIN(*minx, x);
-			  *maxx = isMAX(*maxx, x);
-				printf("Check  x==0 with x = %d\n",x);
-				break;
-			}
-		}
-		else if (x == width - 1)
-		{
-			if((whitecolumn(pixbuf,x) == height)
-					&&(whitecolumn(pixbuf,x-1) != height))
-			{
-			  *minx = isMIN(*minx, x);
-			  *maxx = isMAX(*maxx, x);
-		 
-				printf("Check  x==h-1 with x = %d\n",x);
-				break;
-			}
-		}
-		else if ((whitecolumn(pixbuf,x) == height)
-		&& ((whitecolumn(pixbuf,x-1) != height ||
-		(whitecolumn(pixbuf,x+1) != height ))))
-		{
-		  *minx = isMIN(*minx, x);
-		  *maxx = isMAX(*maxx, x);
-		  toto ++;
-		}
+	  if ((whitecolumn(pixbuf,x) == height)
+	      && (whitecolumn(pixbuf,x + 1) != height))
+	    {
+	      *minx = isMIN(*minx, x);
+	      *maxx = isMAX(*maxx, x);
+	    }
 	}
-	put_redcolumn(pixbuf, *maxx);
-	put_redcolumn(pixbuf, *minx);
+      else if (x == width - 1)
+	{
+	  if((whitecolumn(pixbuf,x) == height)
+	     &&(whitecolumn(pixbuf,x-1) != height))
+	    {
+	      *minx = isMIN(*minx, x);
+	      *maxx = isMAX(*maxx, x);
+	    }
+	}
+      else if ((whitecolumn(pixbuf,x) == height)
+	       && ((whitecolumn(pixbuf,x-1) != height ||
+		    (whitecolumn(pixbuf,x+1) != height ))))
+	{
+	  *minx = isMIN(*minx, x);
+	  *maxx = isMAX(*maxx, x);
+	}
+    }
+  put_redcolumn(pixbuf, *maxx);
+  put_redcolumn(pixbuf, *minx);
+}
+
+void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
+{
+  int width, height, rowstride, n_channels;
+  guchar *pixels, *p;
+  int x;
+  int y;
+
+  // Get all image data needed for this operation
+  n_channels = gdk_pixbuf_get_n_channels (pixbuf);
+  width = gdk_pixbuf_get_width (pixbuf);
+  height = gdk_pixbuf_get_height (pixbuf);
+  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
+  pixels = gdk_pixbuf_get_pixels (pixbuf);
+
+  // Loop through all pixels
+  for (x=0;x<width;x++)
+    {
+      for (y=0;y<height;y++)
+	{
+	  p = pixels + y * rowstride + x * n_channels;
+	  if ((p[0] + p[1] + p[2])/3 > threshold)
+	    {
+	      // White pixel
+	      p[0]=255;
+	      p[1]=255;
+	      p[2]=255;
+	    }
+	  else
+	    {
+	      // Black pixel
+	      p[0]=0;
+	      p[1]=0;
+	      p[2]=0;
+	    }
+	}
+    }
 }

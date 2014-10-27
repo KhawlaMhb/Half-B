@@ -5,88 +5,48 @@
 
 GtkBuilder *builder;
 
-static void ChangeToBW(GdkPixbuf *pixbuf, int threshold);
-
 int main (int argc, char *argv[]) 
 {
   GtkWidget *window1;
   GtkImage *image;
   GdkPixbuf *myBMP;
+  GError *myError = 0;
   int minx, maxx;
+
   minx = 0;
   maxx = 0;
 
-  GError *myError = 0;
-
   gtk_init (&argc, &argv);
 
-  myBMP = gdk_pixbuf_new_from_file("car.jpg",&myError); 
-  // only car.jpg can be read what kind of sorcery is that
+  myBMP = gdk_pixbuf_new_from_file(on_file_activate(),&myError);
   ChangeToBW(myBMP,128);
-  //printf("ahhahao");
   column(myBMP, &minx, &maxx);
   line(myBMP, &minx, &maxx);
-  //printf("ahhaha");
 
+  // Saves the modifications of the file into BWcar.jpg
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
-          
-  builder = gtk_builder_new ();
 
-      gtk_builder_add_from_file (builder, "interfacevstest.glade", NULL);
-        if(myError != NULL)
-        {
-            printf("Error reading interface\nMessage: %s\n",myError->message);
-        }
+  // Builds the interface from the .xml file into the GtkBuilder
+  builder = gtk_builder_new();
 
-      window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
-      image = gtk_builder_get_object(builder, "image1");
-      gtk_image_set_from_file(image, "BWcar.jpeg");
-
-      gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
-
-      gtk_builder_connect_signals (builder, NULL);
-      gtk_widget_show (window1);
-      gtk_widget_show (GTK_WIDGET(image));
-
-      gtk_main ();
-      g_object_unref (G_OBJECT (builder));
-                    
-      return 0;
-}
-
-static void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
-{
-  int width, height, rowstride, n_channels;
-  guchar *pixels, *p;
-  int x;
-  int y;
-  int grey;
-
-  // Get all image data needed for this operation
-  n_channels = gdk_pixbuf_get_n_channels (pixbuf);
-  width = gdk_pixbuf_get_width (pixbuf);
-  height = gdk_pixbuf_get_height (pixbuf);
-  rowstride = gdk_pixbuf_get_rowstride (pixbuf);
-  pixels = gdk_pixbuf_get_pixels (pixbuf);
-
-  // Loop through all pixels
-  for (x=0;x<width;x++)
+  gtk_builder_add_from_file (builder, "interfacevstest.glade", NULL);
+  if(myError != NULL)
     {
-      for (y=0;y<height;y++)
-	{
-	  p = pixels + y * rowstride + x * n_channels;
-	  if ((p[0] + p[1] + p[2])/3 > threshold)
-	    {
-	      p[0]=255;
-	      p[1]=255;
-	      p[2]=255;
-	    }
-	  else
-	    {
-	      p[0]=0;
-	      p[1]=0;
-	      p[2]=0;
-	    }
-	}
+      printf("Error reading interface\nMessage: %s\n",myError->message);
     }
+  // Initialize the window and all the widgets recursively
+  window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
+  gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
+  image = gtk_builder_get_object(builder, "image1");
+  gtk_image_set_from_file(image, "BWcar.jpeg");
+
+  //Connect widgets with callback signals and show window
+  gtk_builder_connect_signals (builder, NULL);
+  gtk_widget_show (window1);
+  gtk_widget_show (GTK_WIDGET(image));
+
+  gtk_main ();
+  g_object_unref (G_OBJECT (builder));
+                    
+  return 0;
 }

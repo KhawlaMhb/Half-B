@@ -3,9 +3,6 @@
 
 #include <gtk/gtk.h>
 
-/*G_MODULE_EXPORT void on_window1_destroy (GtkObject *object, gpointer user_data) ;*/
-void on_file_activate (GtkWidget *widget, gpointer user_data) ;
-void on_image_display (GObject *object, gpointer user_data) ;
-
+char *on_file_activate ();
 
 #endif /* CALLBACKS_H */

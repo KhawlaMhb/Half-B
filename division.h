@@ -14,6 +14,7 @@ void column(GdkPixbuf *pixbuf, int *minx, int *maxx);
 int whitecolumn(GdkPixbuf *pixbuf,int y);
 void put_redcolumn(GdkPixbuf *pixbuf, int y);
 int isWhite(guchar *p);
+void ChangeToBW(GdkPixbuf *pixbuf, int threshold);
 
 
 #endif
