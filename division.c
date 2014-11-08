@@ -4,6 +4,8 @@
 #include <gdk/gdk.h>
 #include "division.h"
 
+
+
 guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
 {
   int rowstride, n_channels;
@@ -66,11 +68,6 @@ int whiteline(GdkPixbuf *pixbuf, int y)
 void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
 {
   int x;
-  //int xcol=0;
-  //guchar *p;
-  //int width = gdk_pixbuf_get_width(pixbuf);
-
-  //p = get_pixel(pixbuf, x, y);
 
   for(x = minx ; x < maxx ; x++)
     {
@@ -79,7 +76,8 @@ void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
 }
 
 // Goes through the image and draw a redline when needed
-void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
+void line(GdkPixbuf *pixbuf, int *minx, int *maxx, 
+	  int arrLines[], int *arrLinesMax)
 {
   int width = gdk_pixbuf_get_width(pixbuf);
   int height = gdk_pixbuf_get_height(pixbuf);
@@ -93,6 +91,7 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 	     &&(whiteline(pixbuf,y+1) != width))
 	    {
 	      put_redline(pixbuf, y, *minx, *maxx);
+	      arrLines[(*arrLinesMax)++] = y;
 	      break;
 	    }
 	}
@@ -104,6 +103,7 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 		 && (whiteline(pixbuf,y-1) != width))
 		{
 		  put_redline(pixbuf, y, *minx, *maxx);
+		  arrLines[(*arrLinesMax)++] = y;
 		  break;
 		}
 	    }
@@ -114,9 +114,14 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx)
 		     (whiteline(pixbuf,y+1) != width)))
 		{
 		  put_redline(pixbuf, y, *minx, *maxx);
+		  arrLines[(*arrLinesMax)++] = y;
 		}
 	    }
 	}
+    }
+  for(int i = 0; i<*arrLinesMax; i++)
+    {
+      printf("line %d = %d\n",i,arrLines[i]);
     }
 }
 

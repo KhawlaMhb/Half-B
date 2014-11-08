@@ -5,13 +5,15 @@
 
 GtkBuilder *builder;
 
-int main (int argc, char *argv[]) 
+int main (int argc, char *argv[])
 {
   GtkWidget *window1;
   GtkImage *image;
   GdkPixbuf *myBMP;
   GError *myError = 0;
   int minx, maxx;
+  int arrLines[100];
+  int arrLinesMax = 0;
 
   minx = 0;
   maxx = 0;
@@ -21,7 +23,7 @@ int main (int argc, char *argv[])
   myBMP = gdk_pixbuf_new_from_file(on_file_activate(),&myError);
   ChangeToBW(myBMP,128);
   column(myBMP, &minx, &maxx);
-  line(myBMP, &minx, &maxx);
+  line(myBMP, &minx, &maxx, arrLines, &arrLinesMax);
 
   // Saves the modifications of the file into BWcar.jpg
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
@@ -37,7 +39,7 @@ int main (int argc, char *argv[])
   // Initialize the window and all the widgets recursively
   window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
   gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
-  image = gtk_builder_get_object(builder, "image1");
+  image = GTK_IMAGE(gtk_builder_get_object(builder, "image1"));
   gtk_image_set_from_file(image, "BWcar.jpeg");
 
   //Connect widgets with callback signals and show window
@@ -47,6 +49,6 @@ int main (int argc, char *argv[])
 
   gtk_main ();
   g_object_unref (G_OBJECT (builder));
-                    
+
   return 0;
 }
