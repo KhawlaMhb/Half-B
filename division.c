@@ -17,7 +17,7 @@ guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
   return p;
 }
 
-static void put_pixel (GdkPixbuf *pixbuf, int x, int y,
+void put_pixel (GdkPixbuf *pixbuf, int x, int y,
 		       guchar red, guchar green, guchar blue)
 {
   int width, height, rowstride, n_channels;
@@ -75,7 +75,6 @@ void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
   for(x = minx ; x < maxx ; x++)
     {
       put_pixel(pixbuf, x, y, 255, 0, 0); //red pixel value
-      x++;
     }
 }
 
@@ -143,7 +142,6 @@ int isWhite(guchar *p)
   }
   return 0;
 }
-
 
 // Check if the whole column has only white pixels
 int whitecolumn(GdkPixbuf *pixbuf, int x)
