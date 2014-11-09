@@ -145,14 +145,14 @@ int isWhite(guchar *p)
   return 0;
 }
 
-// Check if the whole column has only white pixels
-int whitecolumn(GdkPixbuf *pixbuf, int x)
+// Check the white columns between two given lines
+// the lines were found thanks to put_redline (saved in an array)
+int whitecolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
 {
   int count = 0;
   guchar *p;
   int y;
-
-  for(y = 0; y < gdk_pixbuf_get_height(pixbuf); y++)
+  for(y = y1; y < y2; y++)
     {
       p = get_pixel(pixbuf, x, y);
 
@@ -165,13 +165,12 @@ int whitecolumn(GdkPixbuf *pixbuf, int x)
   return count;
 }
 
-// Draws a red column
-void put_redcolumn(GdkPixbuf *pixbuf, int x)
+// Draws a red column between two given lines
+void put_redcolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
 {
-  int y = 0;
-  int height = gdk_pixbuf_get_height(pixbuf);
+  int y = y1;
 
-  while(y < height)
+  while(y < y2)
     {
       // Color the pixel in red
       put_pixel(pixbuf, x, y, 255, 0, 0);
@@ -193,8 +192,8 @@ void column(OCR *o)
     {
       if(x == 0)
 	{
-	  if ((whitecolumn(o->pixbuf,x) == height)
-	      && (whitecolumn(o->pixbuf,x + 1) != height))
+	  if ((whitecolumn2(o->pixbuf,x,0,height) == height)
+	      && (whitecolumn2(o->pixbuf,x + 1,0,height) != height))
 	    {
 	      o->minx = isMIN(o->minx, x);
 	      o->maxx = isMAX(o->maxx, x);
@@ -202,57 +201,23 @@ void column(OCR *o)
 	}
       else if (x == width - 1)
 	{
-	  if((whitecolumn(o->pixbuf,x) == height)
-	     &&(whitecolumn(o->pixbuf,x-1) != height))
+	  if((whitecolumn2(o->pixbuf,x,0,height) == height)
+	     &&(whitecolumn2(o->pixbuf,x-1,0,height) != height))
 	    {
 	      o->minx = isMIN(o->minx, x);
 	      o->maxx = isMAX(o->maxx, x);
 	    }
 	}
-      else if ((whitecolumn(o->pixbuf,x) == height)
-	       && ((whitecolumn(o->pixbuf,x-1) != height ||
-		    (whitecolumn(o->pixbuf,x+1) != height ))))
+      else if ((whitecolumn2(o->pixbuf,x,0,height) == height)
+	       && ((whitecolumn2(o->pixbuf,x-1,0,height) != height ||
+		    (whitecolumn2(o->pixbuf,x+1,0,height) != height ))))
 	{
 	  o->minx = isMIN(o->minx, x);
 	  o->maxx = isMAX(o->maxx, x);
 	}
     }
-  put_redcolumn(o->pixbuf, o->maxx);
-  put_redcolumn(o->pixbuf, o->minx);
-}
-
-// Check the white columns between two given lines
-// the lines were found thanks to put_redline (saved in an array)
-int whitecolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
-{
-  int count = 0;
-  guchar *p;
-  int y;
-  for(y = y1; y < y2; y++)
-    {
-      p = get_pixel(pixbuf, x, y);
-
-      //if the pixel is white
-      if(isWhite(p))
-	{
-	  count++;
-	}
-    }
-  return count;
-}
-
-
-// Draws a red column between two given lines
-void put_redcolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
-{
-  int y = y1;
-
-  while(y < y2)
-    {
-      // Color the pixel in red
-      put_pixel(pixbuf, x, y, 255, 0, 0);
-      y++;
-    }
+  put_redcolumn2(o->pixbuf, o->maxx,0,height);
+  put_redcolumn2(o->pixbuf, o->minx,0,height);
 }
 
 // Goes through two given lines, and puts a column
@@ -342,14 +307,3 @@ void process_text_lines(OCR *o)
       column2(o, o->arrLines[i]+1, o->arrLines[i+1]);
     }
 }
-
-/*void process_text_columns(GdkPixbuf *pixbuf, int minx, int maxx, 
-			int *arrColumns, int arrColumnsMax)
-{
-  // Print coordinates of each rectangle into the console
-  for(int i = 0; i < arrColumnsMax ; i += 2)
-    {
-      // Detect characters
-      // column2(pixbuf, (minx)+1, (maxx)-1, arrColumns[i]+1, arrColumns[i+1]);
-    }
-    }*/
