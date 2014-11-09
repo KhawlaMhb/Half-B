@@ -25,6 +25,9 @@ int main (int argc, char *argv[])
   column(myBMP, &minx, &maxx);
   line(myBMP, &minx, &maxx, arrLines, &arrLinesMax);
 
+  // Print the rectangle containing each line of text
+  process_text_lines(myBMP, minx, maxx, arrLines, arrLinesMax);
+
   // Saves the modifications of the file into BWcar.jpg
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
 

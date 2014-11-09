@@ -224,6 +224,79 @@ void column(GdkPixbuf *pixbuf, int *minx, int *maxx)
   put_redcolumn(pixbuf, *minx);
 }
 
+// Check the white columns between two given lines
+// the lines were found thanks to put_redline (saved in an array)
+int whitecolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
+{
+  int count = 0;
+  guchar *p;
+  int y;
+  for(y = y1; y < y2; y++)
+    {
+      p = get_pixel(pixbuf, x, y);
+
+      //if the pixel is white
+      if(isWhite(p))
+	{
+	  count++;
+	}
+    }
+  return count;
+}
+
+
+// Draws a red column between two given lines
+void put_redcolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
+{
+  int y = y1;
+
+  while(y < y2)
+    {
+      // Color the pixel in red
+      put_pixel(pixbuf, x, y, 255, 0, 0);
+      y++;
+    }
+}
+
+// Goes through two given lines, and puts a column
+// next to a character (before and after)
+// Input
+//      *pixbuf  
+void column2(GdkPixbuf *pixbuf, int minx, int maxx, int y1, int y2)
+{
+  int height = y2-y1;
+  int x;
+
+  // *maxx = 0;
+  // *minx = height;
+
+  for(x = minx; x < maxx; x++)
+    {
+      if(x == minx)
+	{
+	  if ((whitecolumn2(pixbuf,x, y1, y2) == height)
+	      && (whitecolumn2(pixbuf,x + 1, y1, y2) != height))
+	    {
+	      put_redcolumn2(pixbuf, x, y1, y2);
+	    }
+	}
+      else if (x == maxx - 1)
+	{
+	  if((whitecolumn2(pixbuf,x, y1, y2) == height)
+	     &&(whitecolumn2(pixbuf,x-1, y1, y2) != height))
+	    {
+	      put_redcolumn2(pixbuf, x, y1, y2);
+	    }
+	}
+      else if ((whitecolumn2(pixbuf, x, y1, y2) == height)
+	       && ((whitecolumn2(pixbuf, x-1, y1, y2) != height ||
+		    (whitecolumn2(pixbuf, x+1, y1, y2) != height ))))
+	{
+	  put_redcolumn2(pixbuf, x, y1, y2);
+	}
+    }
+}
+
 void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
 {
   int width, height, rowstride, n_channels;
@@ -239,9 +312,9 @@ void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
   pixels = gdk_pixbuf_get_pixels (pixbuf);
 
   // Loop through all pixels
-  for (x=0;x<width;x++)
+  for (x = 0; x < width; x++)
     {
-      for (y=0;y<height;y++)
+      for (y = 0; y < height; y++)
 	{
 	  p = pixels + y * rowstride + x * n_channels;
 	  if ((p[0] + p[1] + p[2])/3 > threshold)
@@ -259,5 +332,16 @@ void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
 	      p[2]=0;
 	    }
 	}
+    }
+}
+
+void process_text_lines(GdkPixbuf *pixbuf, int minx, int maxx, 
+			int *arrLines, int arrLinesMax)
+{
+  // Print coordinates of each rectangle into the console
+  for(int i = 0; i < arrLinesMax ; i += 2)
+    {
+      // Detect characters
+      column2(pixbuf, (minx)+1, (maxx)-1, arrLines[i]+1, arrLines[i+1]-1);
     }
 }
