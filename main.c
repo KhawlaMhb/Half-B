@@ -11,22 +11,35 @@ int main (int argc, char *argv[])
   GtkImage *image;
   GdkPixbuf *myBMP;
   GError *myError = 0;
-  int minx, maxx;
-  int arrLines[100];
-  int arrLinesMax = 0;
+  //int minx, maxx;
+  //int arrLines[100];
+  //int arrLinesMax = 0;
+  //int arrColumns[100];
+  //int arrColumnsMax = 0;
+  OCR myOCR;
 
-  minx = 0;
-  maxx = 0;
+  // minx = 0;
+  //maxx = 0;
 
   gtk_init (&argc, &argv);
 
   myBMP = gdk_pixbuf_new_from_file(on_file_activate(),&myError);
   ChangeToBW(myBMP,128);
-  column(myBMP, &minx, &maxx);
-  line(myBMP, &minx, &maxx, arrLines, &arrLinesMax);
 
+  myOCR.pixbuf = myBMP;
+  myOCR.minx = 0;
+  myOCR.maxx = 0;
+  myOCR.arrLinesMax = 0;
+  myOCR.arrColumnsMax = 0;
+  myOCR.TextLinesMax = 0;
+  myOCR.CharBoxesMax = 0;
+
+  column(&myOCR);
+  line(&myOCR);
+
+  printf("line1 = %d\n",myOCR.arrLines[0]);
   // Print the rectangle containing each line of text
-  process_text_lines(myBMP, minx, maxx, arrLines, arrLinesMax);
+  process_text_lines(&myOCR);
 
   // Saves the modifications of the file into BWcar.jpg
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);

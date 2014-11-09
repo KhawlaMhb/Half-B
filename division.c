@@ -4,8 +4,6 @@
 #include <gdk/gdk.h>
 #include "division.h"
 
-
-
 guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y)
 {
   int rowstride, n_channels;
@@ -76,22 +74,21 @@ void put_redline(GdkPixbuf *pixbuf, int y, int minx, int maxx)
 }
 
 // Goes through the image and draw a redline when needed
-void line(GdkPixbuf *pixbuf, int *minx, int *maxx, 
-	  int arrLines[], int *arrLinesMax)
+void line(OCR *o)
 {
-  int width = gdk_pixbuf_get_width(pixbuf);
-  int height = gdk_pixbuf_get_height(pixbuf);
+  int width = gdk_pixbuf_get_width(o->pixbuf);
+  int height = gdk_pixbuf_get_height(o->pixbuf);
   int y;
 
   for(y=0; y < height; y++)
     {
       if(y == 0)
 	{
-	  if((whiteline(pixbuf,y) == width)
-	     &&(whiteline(pixbuf,y+1) != width))
+	  if((whiteline(o->pixbuf,y) == width)
+	     &&(whiteline(o->pixbuf,y+1) != width))
 	    {
-	      put_redline(pixbuf, y, *minx, *maxx);
-	      arrLines[(*arrLinesMax)++] = y;
+	      put_redline(o->pixbuf, y, o->minx, o->maxx);
+	      o->arrLines[(o->arrLinesMax)++] = y;
 	      break;
 	    }
 	}
@@ -99,29 +96,29 @@ void line(GdkPixbuf *pixbuf, int *minx, int *maxx,
 	{
 	  if(y == height - 1)
 	    {
-	      if((whiteline(pixbuf,y) == width)
-		 && (whiteline(pixbuf,y-1) != width))
+	      if((whiteline(o->pixbuf,y) == width)
+		 && (whiteline(o->pixbuf,y-1) != width))
 		{
-		  put_redline(pixbuf, y, *minx, *maxx);
-		  arrLines[(*arrLinesMax)++] = y;
+		  put_redline(o->pixbuf, y, o->minx, o->maxx);
+		  o->arrLines[(o->arrLinesMax)++] = y;
 		  break;
 		}
 	    }
 	  else
 	    {
-	      if((whiteline(pixbuf,y) == width)
-		 && (((whiteline(pixbuf,y-1) != width)) ||
-		     (whiteline(pixbuf,y+1) != width)))
+	      if((whiteline(o->pixbuf,y) == width)
+		 && (((whiteline(o->pixbuf,y-1) != width)) ||
+		     (whiteline(o->pixbuf,y+1) != width)))
 		{
-		  put_redline(pixbuf, y, *minx, *maxx);
-		  arrLines[(*arrLinesMax)++] = y;
+		  put_redline(o->pixbuf, y, o->minx, o->maxx);
+		  o->arrLines[o->arrLinesMax++] = y;
 		}
 	    }
 	}
     }
-  for(int i = 0; i<*arrLinesMax; i++)
+  for(int i = 0; i<o->arrLinesMax; i++)
     {
-      printf("line %d = %d\n",i,arrLines[i]);
+      printf("line %d = %d\n",i,o->arrLines[i]);
     }
 }
 
@@ -183,45 +180,45 @@ void put_redcolumn(GdkPixbuf *pixbuf, int x)
 }
 
 // Goes through the image and draws a red column when needed
-void column(GdkPixbuf *pixbuf, int *minx, int *maxx)
+void column(OCR *o)
 {
-  int width  = gdk_pixbuf_get_width(pixbuf);
-  int height = gdk_pixbuf_get_height(pixbuf);
+  int width  = gdk_pixbuf_get_width(o->pixbuf);
+  int height = gdk_pixbuf_get_height(o->pixbuf);
   int x;
 
-  *maxx = 0;
-  *minx = height;
+  o->maxx = 0;
+  o->minx = height;
 
   for(x = 0; x < width; x++)
     {
       if(x == 0)
 	{
-	  if ((whitecolumn(pixbuf,x) == height)
-	      && (whitecolumn(pixbuf,x + 1) != height))
+	  if ((whitecolumn(o->pixbuf,x) == height)
+	      && (whitecolumn(o->pixbuf,x + 1) != height))
 	    {
-	      *minx = isMIN(*minx, x);
-	      *maxx = isMAX(*maxx, x);
+	      o->minx = isMIN(o->minx, x);
+	      o->maxx = isMAX(o->maxx, x);
 	    }
 	}
       else if (x == width - 1)
 	{
-	  if((whitecolumn(pixbuf,x) == height)
-	     &&(whitecolumn(pixbuf,x-1) != height))
+	  if((whitecolumn(o->pixbuf,x) == height)
+	     &&(whitecolumn(o->pixbuf,x-1) != height))
 	    {
-	      *minx = isMIN(*minx, x);
-	      *maxx = isMAX(*maxx, x);
+	      o->minx = isMIN(o->minx, x);
+	      o->maxx = isMAX(o->maxx, x);
 	    }
 	}
-      else if ((whitecolumn(pixbuf,x) == height)
-	       && ((whitecolumn(pixbuf,x-1) != height ||
-		    (whitecolumn(pixbuf,x+1) != height ))))
+      else if ((whitecolumn(o->pixbuf,x) == height)
+	       && ((whitecolumn(o->pixbuf,x-1) != height ||
+		    (whitecolumn(o->pixbuf,x+1) != height ))))
 	{
-	  *minx = isMIN(*minx, x);
-	  *maxx = isMAX(*maxx, x);
+	  o->minx = isMIN(o->minx, x);
+	  o->maxx = isMAX(o->maxx, x);
 	}
     }
-  put_redcolumn(pixbuf, *maxx);
-  put_redcolumn(pixbuf, *minx);
+  put_redcolumn(o->pixbuf, o->maxx);
+  put_redcolumn(o->pixbuf, o->minx);
 }
 
 // Check the white columns between two given lines
@@ -262,39 +259,39 @@ void put_redcolumn2(GdkPixbuf *pixbuf, int x, int y1, int y2)
 // next to a character (before and after)
 // Input
 //      *pixbuf  
-void column2(GdkPixbuf *pixbuf, int minx, int maxx, int y1, int y2)
+void column2(OCR *o, int y1, int y2)
 {
   int height = y2-y1;
   int x;
 
-  // *maxx = 0;
-  // *minx = height;
-
-  for(x = minx; x < maxx; x++)
+  printf("start column2 y1 = %d, y2 = %d\n",y1,y2);
+  for(x = o->minx; x < o->maxx; x++)
     {
-      if(x == minx)
+      if(x == o->minx)
 	{
-	  if ((whitecolumn2(pixbuf,x, y1, y2) == height)
-	      && (whitecolumn2(pixbuf,x + 1, y1, y2) != height))
+	  if ((whitecolumn2(o->pixbuf,x, y1, y2) == height)
+	      && (whitecolumn2(o->pixbuf,x + 1, y1, y2) != height))
 	    {
-	      put_redcolumn2(pixbuf, x, y1, y2);
+	      put_redcolumn2(o->pixbuf, x, y1, y2);
+	      o->arrColumns[o->arrColumnsMax++] = x;
 	    }
 	}
-      else if (x == maxx - 1)
-	{
-	  if((whitecolumn2(pixbuf,x, y1, y2) == height)
-	     &&(whitecolumn2(pixbuf,x-1, y1, y2) != height))
+      else if ((x == o->maxx - 1) && ((whitecolumn2(o->pixbuf,x,y1,y2)== height)
+	     &&(whitecolumn2(o->pixbuf,x-1, y1, y2) != height)))
 	    {
-	      put_redcolumn2(pixbuf, x, y1, y2);
+	      put_redcolumn2(o->pixbuf, x, y1, y2);
+	      o->arrColumns[o->arrColumnsMax++] = x;
 	    }
-	}
-      else if ((whitecolumn2(pixbuf, x, y1, y2) == height)
-	       && ((whitecolumn2(pixbuf, x-1, y1, y2) != height ||
-		    (whitecolumn2(pixbuf, x+1, y1, y2) != height ))))
+	
+      else if ((whitecolumn2(o->pixbuf, x, y1, y2) == height)
+	       && ((whitecolumn2(o->pixbuf, x-1, y1, y2) != height ||
+		    (whitecolumn2(o->pixbuf, x+1, y1, y2) != height ))))
 	{
-	  put_redcolumn2(pixbuf, x, y1, y2);
+	  put_redcolumn2(o->pixbuf, x, y1, y2);
+	  o->arrColumns[o->arrColumnsMax++] = x;
 	}
     }
+  printf("rectangle\n");
 }
 
 void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
@@ -335,13 +332,24 @@ void ChangeToBW(GdkPixbuf *pixbuf, int threshold)
     }
 }
 
-void process_text_lines(GdkPixbuf *pixbuf, int minx, int maxx, 
-			int *arrLines, int arrLinesMax)
+void process_text_lines(OCR *o)
 {
   // Print coordinates of each rectangle into the console
-  for(int i = 0; i < arrLinesMax ; i += 2)
+  printf("arrlinesmax = %d\n",o->arrLinesMax);
+  for(int i = 0; i < o->arrLinesMax ; i += 2)
     {
       // Detect characters
-      column2(pixbuf, (minx)+1, (maxx)-1, arrLines[i]+1, arrLines[i+1]-1);
+      column2(o, o->arrLines[i]+1, o->arrLines[i+1]);
     }
 }
+
+/*void process_text_columns(GdkPixbuf *pixbuf, int minx, int maxx, 
+			int *arrColumns, int arrColumnsMax)
+{
+  // Print coordinates of each rectangle into the console
+  for(int i = 0; i < arrColumnsMax ; i += 2)
+    {
+      // Detect characters
+      // column2(pixbuf, (minx)+1, (maxx)-1, arrColumns[i]+1, arrColumns[i+1]);
+    }
+    }*/

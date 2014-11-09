@@ -15,19 +15,30 @@ struct rectangle_struct
 // Use rectangle for declaring variables instead of struct
 typedef struct rectangle_struct rectangle;
 
+struct OCR_struct
+{
+  GdkPixbuf *pixbuf;
+  int minx;            // Left Boundary of the Text
+  int maxx;            // Right Boundary of the Text
+  int arrLines[100];   // Array containing the lines
+  int arrLinesMax;           // Number of lines in the array arrLines
+  int arrColumns[100];       // Array containing the columns
+  int arrColumnsMax;         // Number of columns in the array
+  rectangle TextLines[100];
+  int TextLinesMax;
+  rectangle CharBoxes[100];  // Character Areas
+  int CharBoxesMax;          // Number of Character Areas
+};
+typedef struct OCR_struct OCR;
+
 void put_pixel (GdkPixbuf *pixbuf, int x, int y, 
 		       guchar red, guchar green, guchar blue);
 guchar* get_pixel(GdkPixbuf *pixbuf, int x, int y);
-void line (GdkPixbuf *pixbuf, int *minx, int *maxx, 
-	   int arrLines[], int *arrLinesMax);
-int whiteline(GdkPixbuf *pixbuf,int y);
-void column(GdkPixbuf *pixbuf, int *minx, int *maxx);
-int whitecolumn(GdkPixbuf *pixbuf,int x);
-void put_redcolumn(GdkPixbuf *pixbuf, int y);
+void line (OCR *o);
+void column(OCR *o);
 int isWhite(guchar *p);
 void ChangeToBW(GdkPixbuf *pixbuf, int threshold);
-void process_text_lines(GdkPixbuf *pixbuf, int minx, int maxx, 
-			int *arrLines, int arrLinesMax);
+void process_text_lines(OCR *o);
 
 
 #endif
