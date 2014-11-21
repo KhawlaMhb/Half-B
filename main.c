@@ -42,12 +42,18 @@ int main (int argc, char *argv[])
   process_text_lines(&myOCR);
 
   // Saves the modifications of the file into BWcar.jpg
+  if(gdk_pixbuf_get_width(myBMP)>700 && gdk_pixbuf_get_height(myBMP)>700)
+  {
+ myBMP = gdk_pixbuf_scale_simple (myBMP,gdk_pixbuf_get_width(myBMP)/2,
+        gdk_pixbuf_get_height(myBMP)/2, GDK_INTERP_NEAREST);
+  }
+
   gdk_pixbuf_save(myBMP,"BWcar.jpeg", "jpeg", &myError,NULL);
 
   // Builds the interface from the .xml file into the GtkBuilder
   builder = gtk_builder_new();
 
-  gtk_builder_add_from_file (builder, "interfacevstest.glade", NULL);
+  gtk_builder_add_from_file (builder, "interfacevs1.glade", NULL);
   if(myError != NULL)
     {
       printf("Error reading interface\nMessage: %s\n",myError->message);
@@ -55,6 +61,7 @@ int main (int argc, char *argv[])
   // Initialize the window and all the widgets recursively
   window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
   gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
+  gtk_window_set_resizable (GTK_WINDOW(window1), FALSE);
   image = GTK_IMAGE(gtk_builder_get_object(builder, "image1"));
   gtk_image_set_from_file(image, "BWcar.jpeg");
 
