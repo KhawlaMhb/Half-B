@@ -9,7 +9,8 @@ GtkBuilder *builder;
 int main (int argc, char *argv[])
 {
   GtkWidget *window1;
-  GtkImage *image;
+  GtkImage *image1;
+  GtkImage *image2;
   GdkPixbuf *myBMP;
   GError *myError = 0;
   //int minx, maxx;
@@ -23,8 +24,9 @@ int main (int argc, char *argv[])
   //maxx = 0;
 
   gtk_init (&argc, &argv);
+  char *picture = on_file_activate();
 
-  myBMP = gdk_pixbuf_new_from_file(on_file_activate(),&myError);
+  myBMP = gdk_pixbuf_new_from_file(picture, &myError);
   ChangeToBW(myBMP,128);
 
   myOCR.pixbuf = myBMP;
@@ -65,13 +67,18 @@ int main (int argc, char *argv[])
   window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));
   gtk_window_set_default_size(GTK_WINDOW(window1), 640, 480);
   gtk_window_set_resizable (GTK_WINDOW(window1), FALSE);
-  image = GTK_IMAGE(gtk_builder_get_object(builder, "image1"));
-  gtk_image_set_from_file(image, "BWcar.jpeg");
+  image1 = GTK_IMAGE(gtk_builder_get_object(builder, "image1"));
+  image2 = GTK_IMAGE(gtk_builder_get_object(builder, "image2"));
+  gtk_image_set_from_file(image1,picture);
+  gtk_image_set_from_file(image2, "BWcar.jpeg");
+
 
   //Connect widgets with callback signals and show window
   gtk_builder_connect_signals (builder, NULL);
   gtk_widget_show (window1);
-  gtk_widget_show (GTK_WIDGET(image));
+  gtk_widget_show (GTK_WIDGET(image1));
+  gtk_widget_show (GTK_WIDGET(image2));
+
 
   gtk_main ();
   g_object_unref (G_OBJECT (builder));
