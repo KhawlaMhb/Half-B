@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include "callbacks.h"
 #include "division.h"
+#include "rs_ocr.h"
 
 GtkBuilder *builder;
 
@@ -33,6 +34,8 @@ int main (int argc, char *argv[])
   myOCR.arrColumnsMax = 0;
   myOCR.TextLinesMax = 0;
   myOCR.CharBoxesMax = 0;
+
+  RS_Test(&myOCR);
 
   column(&myOCR);
   line(&myOCR);
