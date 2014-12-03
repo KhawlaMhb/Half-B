@@ -3,6 +3,7 @@
 #include "callbacks.h"
 #include "division.h"
 #include "rs_ocr.h"
+#include "neural_network.h"
 
 GtkBuilder *builder;
 
@@ -38,6 +39,7 @@ int main (int argc, char *argv[])
   myOCR.CharBoxesMax = 0;
 
   RS_Test(&myOCR);
+  mainNW();
 
   column(&myOCR);
   line(&myOCR);
