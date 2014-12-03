@@ -4,6 +4,7 @@
 #include <gdk/gdk.h>
 #include "division.h"
 #include "rs_ocr.h"
+#include "neural_network.h"
 
 int RS_PixelIsBlack(OCR *o, int x, int y)
 {
@@ -36,8 +37,11 @@ int RS_HasBlackPixels(OCR *o, int y)
     return numPixels;
 }
 
-void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2)
+// LetterNumber is the number of the letter in the line (1=A when learning)
+void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2, int LetterNumber)
 {
+
+
     // Process the Character
     // Scale to standard Size ?
     // Have to create a standard size array
@@ -55,30 +59,14 @@ void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2)
     // Scale to 8*8 array
     // Need to find a way not to lose to many pixels
     // This way is risky as a single vertical column may be lost by the reduction
-    char arr[8][8];
-
-    for (int y = 0;y<8;y++)
-    {
-        for(int x = 0;x<8;x++)
-        {
-            // Reduce/Scale scanned character to 8*8
-            int x3 = (x2-x1)*x/8;
-            int y3 = (y2-y1)*y/8;
-
-            // DO not forget to offset (x1+x3) and (y1+y3)
-            if(RS_PixelIsBlack(o,x1+x3,y1+y3)) arr[x][y]='X'; else arr[x][y]=' ';
-        }
-    }
-    // Show the reduced letter
-    for (int y = 0;y<8;y++)
-    {
-        for(int x = 0;x<8;x++) printf("%c",arr[x][y]);
-        printf("\n");
-    }
+    char arr[8][8];         // For printing
+    float chararr[8][8];    // For the neural network
 
     // Now the other way around: Scan full character, and fill 8*8
     // This gives better results: The reduced letter resembles more the original
     for (int y = 0;y<8;y++) for(int x = 0;x<8;x++) arr[x][y]=' ';
+    for (int y = 0;y<8;y++) for(int x = 0;x<8;x++) chararr[x][y]=-1.0;
+
     for (int y = y1;y<y2;y++)
     {
         for(int x = x1;x<x2;x++)
@@ -86,7 +74,11 @@ void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2)
             // Transform 8*8 coordinate
             int x3 = 8*(x-x1)/(x2-x1);
             int y3 = 8*(y-y1)/(y2-y1);
-            if(RS_PixelIsBlack(o,x,y)) arr[x3][y3]='X';
+            if(RS_PixelIsBlack(o,x,y))
+            {
+                arr[x3][y3]='X';
+                chararr[x3][y3]=1.0;
+            }
         }
     }
     // Show the reduced letter
@@ -96,12 +88,15 @@ void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2)
         printf("\n");
     }
 
-    // Now really process the letter: Return a string
-    /*int LetterArray[8][8];        // Store 8*8
-    for (int y = 0;y<8;y++)
-    {
-        for(int x = 0;x<8;x++) LetterArray[x][y] = arr[x][y];
-    }*/
+
+    // Insert data into the neural network
+    AddLetter(chararr,LetterNumber);
+
+
+
+
+    //return LetterArray;
+
 }
 
 void RS_ProcessLine(OCR *o,int Start, int End)
@@ -128,6 +123,7 @@ void RS_ProcessLine(OCR *o,int Start, int End)
 
         if(curCol==0 && prevCol>0)
         {
+            //LastCharacterEnd = CharacterEnd;
             CharacterEnd = x;
             numCharacters++;
             //printf("Character End at %d\n",CharacterEnd);
@@ -135,7 +131,7 @@ void RS_ProcessLine(OCR *o,int Start, int End)
 
             // If there is much blank space, process it as a space character
 
-            RS_ProcessCharacter(o,CharacterStart,Start,CharacterEnd,End);
+            RS_ProcessCharacter(o,CharacterStart,Start,CharacterEnd,End,numCharacters);
         }
     }
     printf("Total Characters on this line is %d\n",numCharacters);
