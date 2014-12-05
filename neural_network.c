@@ -74,7 +74,51 @@ void initInputs()
   //Init biais neuron
   for(int i = 0; i < numHidden; i++) InputsVal[i][numInputs] = 1;
 
-  //FOR THE XOR
+  FILE *f;
+  f = fopen("Letters.txt","r");
+
+  //For each letter
+  for(int i =0; i < 26; i++)
+    {
+      //Read the letter
+      char letter;
+      float valPixel;
+      fscanf(f,"%c",&letter);
+
+      while (letter == ' ') fscanf(f,"%s",&letter);
+      for (int y = 0;y<8;y++)
+	{
+	  for(int x = 0;x<8;x++) 
+	    {
+	      fscanf(f,"%f ",&valPixel);	  
+	      InputsVal[letter-65][x + y *8] = valPixel;
+	    }
+	  for (int x = 0; x < 26; x++)
+	    {
+	      if(x == letter -65) desiredOutput[letter-65][x] = 1;
+	      else desiredOutput[letter-65][x] = -1;
+	    }
+	}
+    }
+
+  //Tp Check if the document was correctly read
+  for(int y = 0; y<8;y++)
+    {
+      for(int x = 0; x < 8 ; x++)
+	printf("%f ",InputsVal[0][x+y *8]);
+      printf("\n");
+    }
+
+  for(int x = 0; x<26; x++)
+    {
+      printf("desired output: %f\n",desiredOutput[1][x]);
+    }
+
+  // *** End of function *** //
+  fclose(f);
+  return;
+
+  // *** FOR THE XOR *** //
 
   //first example, (1, -1) -> 1
   InputsVal[0][0] = 1;
@@ -99,28 +143,6 @@ void initInputs()
   InputsVal[3][1] = -1;
   desiredOutput[3][0] = -1;
   //desiredOutput[3][1] = 1;
-
-
-
-  /*
-    for(int i = 0; i < nbExamples; i++)
-    {
-    for(int j=0; j < nbInputs; j++)
-    {
-    if(rand() % 2 == 0)
-    neuronValueInputs[i][j] = 1;
-    else
-    neuronValueInputs[i][j] = -1;
-    }
-    for(int j=0; j < nbOutput; j++)
-    {
-    if(rand() % 2 == 0)
-    desiredOutput[i][j] = 1;
-    else
-    desiredOutput[i][j] = -1;
-    }
-    }
-  */
 }
 
 // set weights to random numbers
@@ -193,168 +215,8 @@ void backPropagation()
     }
 }
 
-//void initData();
-//void calcNet();
-//void WeightChangesHO();
-//void WeightChangesIH();
-//void calcOverallError();
 void displayResults();
-//double getRand();
 
-
-FILE * fp;                      // Write all outputs in this file for debugging
-
-// ****** NOT USED ***** //
-/*
-// calculates the network output
-void calcNet(void)
-{
-  //calculate the outputs of the hidden neurons
-  int i = 0;
-  int j = 0;
-
-  for(i = 0;i<numHidden;i++)
-    {
-      hiddenVal[i] = 0.0;
-
-      for(j = 0;j<numInputs;j++)
-        {
-	  hiddenVal[i]=hiddenVal[i]+(neuronValueInputs[patNum][j] * weightsIH[j][i]);
-        }
-
-      hiddenVal[i] = tanh(hiddenVal[i]);
-    }
-
-  //calculate the output of the network
-  //outPred = 0.0;
-
-  //TODO: outPred doit etre un tableau
-  // rajouter une boucle
-  // changer outPred en fonction des resultats voulus pour chaque lettre
-  for(int k = 0; k<numPatterns ; k++)
-    {
-      outPred[k] = 0.0;
-  for(i = 0;i<numHidden;i++)
-    {
-      outPred[k] = outPred[k] + hiddenVal[i] * weightsHO[i];
-    }
-  //calculate the error
-  errThisPat[k] = outPred[k] - trainOutput[patNum][k];
-    }
-
-}
-
-void WeightChangesHO(void)
-{
-  for(int k = 0;k<numHidden;k++)
-    {
-      double weightChange = 0.0;
-      for( int i = 0; i<numPatterns; i++)
-	{
-	  weightChange += LR_HO * errThisPat[i]*hiddenVal[k];
-	}
-      weightsHO[k] = weightsHO[k] - weightChange;
-
-      //regularisation on the output weights
-      if (weightsHO[k] < -5)
-	{
-	  weightsHO[k] = -5;
-	}
-      else if (weightsHO[k] > 5)
-	{
-	  weightsHO[k] = 5;
-	}
-	}
-    
-}
-
-// adjust the weights input-hidden
-void WeightChangesIH(void)
-{
-
-  for(int i = 0;i<numHidden;i++)
-    {
-      for(int k = 0;k<numInputs;k++)
-	{
-	  double x = 1 - (hiddenVal[i] * hiddenVal[i]);
-	  // Find what to put in errThisPat[?] 25 won't work
-	  x = x * weightsHO[i] * errThisPat[25] * LR_IH;
-	  x = x * trainInputs[patNum][k];
-	  double weightChange = x;
-	  weightsIH[k][i] = weightsIH[k][i] - weightChange;
-	}
-    }
-}
-
-double getRand(void)
-{
-  return ((double)rand())/(double)RAND_MAX;
-}
-*/
-
-// **** NOT USED **** //
-
-void AddLetter(float arr[8][8],int LetterNumber)
-{
-    for(int x = 0; x<8; x++)
-        for(int y = 0; y<8; y++)
-        {
-            InputsVal[LetterNumber][x + y * 8]  = arr[x][y];
-        }
-
-    for(int i = 0; i<numOutput; i++)
-      if (i==LetterNumber)
-	desiredOutput[LetterNumber][i] = 1;
-      else
-	desiredOutput[LetterNumber][i] = -1;
-
-    // Neurone de biais
-    //InputsVal[LetterNumber][numInputs +1] = 1; 
- }
-
-// ***** NOT USED ***** //
-/*
-void initTrainOutput(void)
-{
-  for(int i = 0; i< numHidden ; i++)
-    {
-      if (i == 0) trainOutput[0][0] = 1;
-      else trainOutput[0][i] = -1;
-    }
-}
-
-void initData(void)
-{
-  printf("initialising data\n");
-
-  // Read Alphabet Image
-  // Get all the letters and initialise trainInputs
-
-
-  // it has been rescaled to the range [-1][1]
-  trainInputs[0][0]  = 1;
-  trainInputs[0][1]  = -1;
-  trainInputs[0][2]  = 1;
-  trainOutput[0] = 1;
-
-  trainInputs[1][0]  = -1;
-  trainInputs[1][1]  = 1;
-  trainInputs[1][2]  = 1;
-  trainOutput[1] = 1;
-
-  trainInputs[2][0]  = 1;
-  trainInputs[2][1]  = 1;
-  trainInputs[2][2]  = 1;
-  trainOutput[2] = -1;
-
-  trainInputs[3][0]  = -1;
-  trainInputs[3][1]  = -1;
-  trainInputs[3][2]  = 1;
-  trainOutput[3] = -1;
-
-  }*/
-
-// display results
 void displayResults(void)
 {
   fowardPropagation();
@@ -372,49 +234,51 @@ void displayResults(void)
     printf("Neural output %i : %g ",k,OutputVal[k]);
 
   printf("\n -------------- \n");
-  
-/*
-    patNum = i;
-    calcNet();
-    printf("pattern number = %d expected = %d obtained = %f\n",
-    patNum+1,trainOutput[patNum][j],outPred[j]);
-    fprintf(fp,"pattern number = %d current = %d neural model = %f\n",
-    patNum+1,trainOutput[patNum][j],outPred[j]);
-    
-  */    
 }
+
+FILE * fp;                      // Write all outputs in this file for debugging
 
 // **** NOT USED **** //
-/*
-// calculate the overall error
-void calcOverallError(void)
+void AddLetter(float arr[8][8],int LetterNumber)
 {
-  RMSerror = 0.0;
-  for(int i = 0;i<numPatterns;i++)
-    {
-      patNum = i;
-      fprintf(fp,"Now calculating pattern %d\n",patNum);
-      calcNet();
-      RMSerror = RMSerror + (errThisPat * errThisPat);
-    }
-  RMSerror = RMSerror/numPatterns;
-  RMSerror = sqrt(RMSerror);
-}
+    for(int x = 0; x<8; x++)
+        for(int y = 0; y<8; y++)
+        {
+            InputsVal[LetterNumber][x + y * 8]  = arr[x][y];
+        }
 
-*/
+    for(int i = 0; i<numOutput; i++)
+      if (i==LetterNumber)
+	desiredOutput[LetterNumber][i] = 1;
+      else
+	desiredOutput[LetterNumber][i] = -1;
+
+    // Neurone de biais
+    //InputsVal[LetterNumber][numInputs +1] = 1; 
+
+}
 
 int mainNW()
 {
   //init random stuff
   srand(time(NULL));
 
-  //initInputs(); we shall use addletter
-  initWeights();
+  initInputs(); //we shall use addletter
+
+  //return 0;
+
+  initWeights(); 
   int numIterations = 0;
   int numcorrect = 0;
   int numstuck = 0;
+
+  // Faire appel à AddLetter pour initialiser InputsVal !!!!!
+  //float arr[8][8];
+  //AddLetter(arr, LetterNumber);  
+
   do
     {
+      printf("Iteration: %d\n",numIterations);
       for(int i = 0; i < numExamples; i++)
 	{
 	  currentExemple = i;//use maybe random for perfs
