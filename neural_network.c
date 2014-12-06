@@ -8,15 +8,15 @@
 
 // ******** PARAMETERS ********* //
 #define numInputs  64       // Number of pixels per letter (without bias)
-#define numHidden 128        // Double number of pixels (Why?)
-#define numOutput 26      // Number of different letters (exemples)
+#define numHidden 70        // Double number of pixels (Why?)
+#define numOutput 2      // Number of different letters (exemples)
 
-#define numExamples 128 // ??? VICTOR ??? 
+#define numExamples 1 // ??? VICTOR ??? 
 
 
 const int numEpochs = 500;
-const double LR_IH = 0.7;
-const double LR_HO = 0.07;
+const double LR_IH = 0.07;
+const double LR_HO = 0.007;
 
  int patNum = 0;
  double errThisPat[numOutput];
@@ -78,7 +78,7 @@ void initInputs()
   f = fopen("Letters.txt","r");
 
   //For each letter
-  for(int i =0; i < 26; i++)
+  for(int i =0; i < numExamples; i++)
     {
       //Read the letter
       char letter;
@@ -93,9 +93,9 @@ void initInputs()
 	      fscanf(f,"%f ",&valPixel);	  
 	      InputsVal[letter-65][x + y *8] = valPixel;
 	    }
-	  for (int x = 0; x < 26; x++)
+	  for (int x = 0; x < numExamples; x++)
 	    {
-	      if(x == letter -65) desiredOutput[letter-65][x] = 1;
+	      if(x == letter - 65) desiredOutput[letter-65][x] = 1;
 	      else desiredOutput[letter-65][x] = -1;
 	    }
 	}
@@ -109,7 +109,7 @@ void initInputs()
       printf("\n");
     }
 
-  for(int x = 0; x<26; x++)
+  for(int x = 0; x<numExamples; x++)
     {
       printf("desired output: %f\n",desiredOutput[1][x]);
     }
@@ -215,8 +215,6 @@ void backPropagation()
     }
 }
 
-void displayResults();
-
 void displayResults(void)
 {
   fowardPropagation();
@@ -278,7 +276,7 @@ int mainNW()
 
   do
     {
-      printf("Iteration: %d\n",numIterations);
+      // printf("Iteration: %d\n",numIterations);
       for(int i = 0; i < numExamples; i++)
 	{
 	  currentExemple = i;//use maybe random for perfs
@@ -353,8 +351,6 @@ int mainNW()
     }
 
     displayResults();*/
-
-  //system("PAUSE");
 
   fclose(fp);
   return 0;
