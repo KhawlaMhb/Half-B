@@ -9,38 +9,32 @@ GtkBuilder *builder;
 
 int main (int argc, char *argv[])
 {
-  GtkWidget *window1;
-  GtkImage *image1;
-  GtkImage *image2;
-  GdkPixbuf *myBMP;
-  GError *myError = 0;
-  //int minx, maxx;
-  //int arrLines[100];
-  //int arrLinesMax = 0;
-  //int arrColumns[100];
-  //int arrColumnsMax = 0;
-  OCR myOCR;
 
-  // minx = 0;
-  //maxx = 0;
+   GtkWidget *window1;
+   GtkImage *image1;
+   GtkImage *image2;
+   GdkPixbuf *myBMP;
+   GError *myError = 0;
+ 
+   OCR myOCR;
 
-  gtk_init (&argc, &argv);
-  char *picture = on_file_activate();
-
-  myBMP = gdk_pixbuf_new_from_file(picture, &myError);
-  ChangeToBW(myBMP,128);
-
-  myOCR.pixbuf = myBMP;
-  myOCR.minx = 0;
-  myOCR.maxx = 0;
-  myOCR.arrLinesMax = 0;
-  myOCR.arrColumnsMax = 0;
-  myOCR.TextLinesMax = 0;
-  myOCR.CharBoxesMax = 0;
-
-  RS_Test(&myOCR);
-  mainNW();
-
+   gtk_init (&argc, &argv);
+   char *picture = on_file_activate();
+ 
+   myBMP = gdk_pixbuf_new_from_file(picture, &myError);
+   ChangeToBW(myBMP,128);
+ 
+   myOCR.pixbuf = myBMP;
+   myOCR.minx = 0;
+   myOCR.maxx = 0;
+   myOCR.arrLinesMax = 0;
+   myOCR.arrColumnsMax = 0;
+   myOCR.TextLinesMax = 0;
+   myOCR.CharBoxesMax = 0;
+ 
+   RS_Test(&myOCR);
+   mainNW_Learn();
+   
   column(&myOCR);
   line(&myOCR);
 
@@ -60,10 +54,10 @@ int main (int argc, char *argv[])
   // Builds the interface from the .xml file into the GtkBuilder
   builder = gtk_builder_new();
 
-  gtk_builder_add_from_file (builder, "interfacevs1.glade", NULL);
+  gtk_builder_add_from_file (builder, "interfacevstest.glade", NULL);
   if(myError != NULL)
     {
-      printf("Error reading interface\nMessage: %s\n",myError->message);
+      printf("Error reading interface\nMessage:%s\n",myError->message);
     }
   // Initialize the window and all the widgets recursively
   window1 = GTK_WIDGET (gtk_builder_get_object (builder, "window"));

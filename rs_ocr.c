@@ -86,13 +86,18 @@ void RS_ProcessCharacter(OCR *o,int x1, int y1, int x2, int y2, int LetterNumber
     {
         for(int x = 0;x<8;x++) printf("%c",arr[x][y]);
         printf("\n");
+	}
+
+    // Save the letter
+    FILE *f;
+    f = fopen("Letters.txt","a");
+    fprintf(f,"%c\n",LetterNumber+'A'-1);       // Calculate ASCII value of letter
+    for (int y = 0;y<8;y++)
+    {
+        for(int x = 0;x<8;x++) fprintf(f,"%f ",chararr[x][y]);
+        fprintf(f,"\n");
     }
-
-
-    // Insert data into the neural network
-    AddLetter(chararr,LetterNumber);
-
-
+    fclose(f);
 
 
     //return LetterArray;
