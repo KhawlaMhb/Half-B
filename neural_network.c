@@ -42,6 +42,75 @@ int limit_nbstuck = 5;
 
 int currentExemple;
 
+//Save the weights
+void Serialization(void)
+{
+  // Open the file to write
+    FILE *f;
+
+    //double weightsIH[numInputs+1][numHidden];
+    f = fopen("WeightsIH.txt","w");
+
+    //Saves the weights from Inputs to Hidden
+    for (int y = 0; y < numInputs; y++)
+    {
+        for(int x = 0;x < numOutput; x++) 
+	  {
+	    fprintf(f,"%f ",weightsIH[y][x]);
+	  }
+        fprintf(f,"\n");
+    }
+    fclose(f);
+
+    //double weightsHO[numHidden][numOutput];
+
+    f = fopen("WeightsHO.txt","w");
+    for (int y = 0; y < numInputs; y++)
+      {
+        for(int x = 0;x < numHidden; x++) 
+	  {
+	    fprintf(f,"%f ",weightsIH[y][x]);
+	  }
+        fprintf(f,"\n");
+      }
+    fclose(f);
+}
+
+void Deserialization(void)
+{
+  FILE *f;
+  float v; 
+  //double weightsIH[numInputs+1][numHidden];
+  f = fopen("WeightsIH.txt","r");
+
+  //Saves the weights from Inputs to Hidden
+  for (int y = 0; y < numInputs; y++)
+    {
+      for(int x = 0;x < numOutput; x++) 
+	{
+	  fscanf(f,"%f",&v);
+	  weightsIH[y][x] = v;
+	}
+    }
+  fclose(f);
+
+  //double weightsHO[numHidden][numOutput];
+  // read file
+  f = fopen("WeightsHO.txt","r");
+
+  //weights from Inputs to Hidden equals to the float in the file
+  for (int y = 0; y < numInputs; y++)
+    {
+      for(int x = 0;x < numOutput; x++) 
+	{
+	  fscanf(f,"%f",&v);
+	  weightsHO[y][x] = v;
+	}
+    }
+    fclose(f);
+}
+
+//Get random between 0 and 1
 double between01()
 {
   double r= rand() / ((double) RAND_MAX);
@@ -258,14 +327,23 @@ void AddLetter(float arr[8][8],int LetterNumber)
 
 }
 
-int mainNW()
+int mainNW_Read()
+{
+  //Initialize the Inputs values, desired output values
+  initInputs();
+
+  Deserialization();
+
+  return 0;
+}
+
+int mainNW_Learn()
 {
   //init random stuff
   srand(time(NULL));
 
-  initInputs(); //we shall use addletter
-
-  //return 0;
+  //Initialize the Inputs values, desired output values
+  initInputs();
 
   initWeights(); 
   int numIterations = 0;
@@ -330,30 +408,5 @@ int mainNW()
       printf("The neural network has been stucked too many times \n");
     }
 
-  return 0;
-
-  /*
-  for(int j = 0;j <= numEpochs;j++)
-    {
-      for(int i = 0;i<numPatterns;i++)
-        {
-	  // patNum = rand()%numPatterns;
-	  patNum = 0;
-          calcNet();
-
-          WeightChangesHO();
-          WeightChangesIH();
-        }
-
-      //after each epoch
-      calcOverallError();
-
-      printf("iteration = %d Error rate = %f\n",j,RMSerror);
-      fprintf(fp,"iteration = %d Error rate = %f\n",j,RMSerror);
-    }
-
-    displayResults();*/
-
-  fclose(fp);
   return 0;
 }
