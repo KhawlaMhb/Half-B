@@ -9,9 +9,9 @@
 // ******** PARAMETERS ********* //
 #define numInputs  64       // Number of pixels per letter (without bias)
 #define numHidden 70        // Double number of pixels (Why?)
-#define numOutput 2      // Number of different letters (exemples)
+#define numOutput 26      // Number of different letters (exemples)
 
-#define numExamples 1 // ??? VICTOR ??? 
+#define numExamples 25 // ??? VICTOR ??? 
 
 
 const int numEpochs = 500;
@@ -74,6 +74,7 @@ void initInputs()
   //Init biais neuron
   for(int i = 0; i < numHidden; i++) InputsVal[i][numInputs] = 1;
 
+  //File that will contain the matrices of the letters with 1 and -1
   FILE *f;
   f = fopen("Letters.txt","r");
 
@@ -93,7 +94,7 @@ void initInputs()
 	      fscanf(f,"%f ",&valPixel);	  
 	      InputsVal[letter-65][x + y *8] = valPixel;
 	    }
-	  for (int x = 0; x < numExamples; x++)
+	  for (int x = 0; x < numExamples+1; x++)
 	    {
 	      if(x == letter - 65) desiredOutput[letter-65][x] = 1;
 	      else desiredOutput[letter-65][x] = -1;
@@ -109,9 +110,10 @@ void initInputs()
       printf("\n");
     }
 
-  for(int x = 0; x<numExamples; x++)
+  // Verify if the desired output has been well impletmented
+  for(int x = 0; x<numExamples+1; x++)
     {
-      printf("desired output: %f\n",desiredOutput[1][x]);
+      printf("desired output: %f\n",desiredOutput[0][x]);
     }
 
   // *** End of function *** //
